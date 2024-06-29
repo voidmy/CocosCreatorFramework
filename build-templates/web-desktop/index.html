@@ -40,28 +40,11 @@
 
 <!-- Import map -->
 <script src="src/import-map.json" type="systemjs-importmap" charset="utf-8"> </script>
-<script type="text/javascript">
-
-          function loadLib(url) {
-            var script = document.createElement("script");
-            script.async = false;
-            script.src = url;
-            document.body.appendChild(script);
-        }
 </script>
 <script>
-  loadLib("CocosCore.js")
-   window.TestLZQ=()=>{
-    console.log("window.TestLZQ================");
 
-   };
-   window.TestLZQ;
     System.import('./index.js').catch(function(err) { console.error(err); })
-    function test(){
-      console.log("test================");
-    }
-    test();
-    sssMa();
+
 </script>
   </body>
 </html>

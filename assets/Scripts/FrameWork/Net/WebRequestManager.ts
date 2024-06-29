@@ -1,3 +1,6 @@
+import { CCEvent } from "../Core/CCEvent";
+import { CCHandler } from "../Core/CCHandler";
+import { HttpRequest } from "../Core/CCHttpRequest";
 
 
 export default class WebRequestManager {
@@ -144,7 +147,7 @@ class WebRequestHolder implements IDestroy {
         holder.destroyed = false;
         holder.m_onComplete = callBack;
         holder.m_xhr.send(url, data, method, "json");
-
+        //holder.m_xhr.send(url, data, method, "text");
         console.log(`Request ${method} ${url}`);
         if (data) console.log(data);
     }
@@ -154,8 +157,8 @@ class WebRequestHolder implements IDestroy {
 
     constructor() {
         this.m_xhr = new HttpRequest();
-        this.m_xhr.on(Pitaya.Event.COMPLETE, this, this.OnComplete);
-        this.m_xhr.on(Pitaya.Event.ERROR, this, this.OnError);
+        this.m_xhr.on(CCEvent.COMPLETE, this, this.OnComplete);
+        this.m_xhr.on(CCEvent.ERROR, this, this.OnError);
     }
 
     destroyed: boolean = false;
@@ -176,6 +179,7 @@ class WebRequestHolder implements IDestroy {
 
         var response = this.m_xhr.data as BaseResponse;
         if (!_isString(response.msg)) {
+            console.log(`response BaseResponse=: `, response);
             response.msg = JSON.stringify(response.msg);
         }
         this.m_onComplete?.runWith(response);
