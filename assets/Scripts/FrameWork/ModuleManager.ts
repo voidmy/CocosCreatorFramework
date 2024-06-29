@@ -56,11 +56,12 @@ declare class MessageCenter
 
     public static remove(receiver: any): void;
 }
-class ModuleManager
+export class ModuleManager
 {
     /** Get a copy of current module list */
     public get modules() { return new Array<Module>(...this.m_modules); }
 
+    public tag :string="7852555";
     private m_modules: Module[] = [];
     private m_updates: Module[] = [];
 
@@ -122,5 +123,5 @@ declare global
     const __manager: ModuleManager;
 }
 
-_m = new ModuleManager();
-__g.__manager = _m;
+//_m = new ModuleManager();
+//__g.__manager = _m;

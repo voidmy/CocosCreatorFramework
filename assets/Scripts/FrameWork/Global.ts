@@ -1,5 +1,5 @@
 export {}
-
+declare var global
 declare global{
 
     const __g: any;
@@ -24,7 +24,8 @@ declare global{
 let g = typeof window === 'undefined' ? typeof globalThis === 'undefined' ? undefined : globalThis : window;
 if (!g)
 {
-    eval(`g = typeof global === 'undefined' ? undefined : global`);
+    g = typeof global === 'undefined' ? undefined : global;
+    //eval(`g = typeof global === 'undefined' ? undefined : global`);
     if (!g) throw 'Failed to initialize global environment, global, globalThis and window is undefined.';
 }
 (g as any).__g = g;
