@@ -1,3 +1,5 @@
+import CCMessageCenter from "./Core/CCMessageCenter";
+
 let _m: any;
 export default abstract class Module implements IMessager
 {
@@ -7,7 +9,7 @@ export default abstract class Module implements IMessager
     sending: number = 0;
     public send(message: string, ...args: any[])
     {
-        MessageCenter.send(this, message, ...args);
+        CCMessageCenter.send(this, message, ...args);
     }
     public readonly name: string;
     public readonly identifier: string;
@@ -41,21 +43,6 @@ interface IMessager
     sending: number;
 }
 
-	/** 消息中心 */
-declare class MessageCenter
-{
-    private static m_senders: IMessager[];
-
-    private static validSender(sender: IMessager): { receiver: any, handler: Function }[];
-
-    public static register(sender: IMessager, receiver: any, handler: Function): void;
-    public static register(sender: IMessager, receiver: any, handler: string): void;
-    public static register(sender: IMessager, receiver: any, handler: string | Function): void;
-
-    public static send(sender: IMessager, message: string, ...args: any[]): void;
-
-    public static remove(receiver: any): void;
-}
 export class ModuleManager
 {
     /** Get a copy of current module list */
@@ -123,5 +110,5 @@ declare global
     const __manager: ModuleManager;
 }
 
-//_m = new ModuleManager();
+_m = new ModuleManager();
 //__g.__manager = _m;

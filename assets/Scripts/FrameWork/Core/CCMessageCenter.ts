@@ -1,10 +1,5 @@
-
-
-// 具体的实现
-class MessageCenter {
-  
-    static m_senders: any;
-    
+ export default class CCMessageCenter {
+    static m_senders: any=[];
     static validSender(sender) {
         return sender && sender.listeners;
     }
@@ -59,6 +54,5 @@ class MessageCenter {
         }
     }
 }
-MessageCenter.m_senders = [];
-//window.MessageCenter = MessageCenter;
-
+CCMessageCenter.m_senders = [];
+//window.CCMessageCenter = CCMessageCenter;
