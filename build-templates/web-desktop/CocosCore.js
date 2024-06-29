@@ -3,7 +3,7 @@ function sssMa(){
 
 }
 // 具体的实现
-class MessageCenter {
+export class MessageCenter {
     static validSender(sender) {
         return sender && sender.listeners;
     }
@@ -61,7 +61,7 @@ class MessageCenter {
 MessageCenter.m_senders = [];
 window.MessageCenter = MessageCenter;
 
-class CCHandler {
+export class CCHandler {
     constructor(caller = null, method = null, args = null, once = false) {
         this.once = false;
         this._id = 0;
@@ -116,7 +116,7 @@ class CCHandler {
         return new Handler(caller, method, args, once);
     }
 }
-CCHandler._pool = [];
+ CCHandler._pool = [];
 CCHandler._gid = 1;
 
 
