@@ -1,6 +1,6 @@
 import CCMessageCenter from "./Core/CCMessageCenter";
 
-let _m: any;
+let _m: any=__g._m;
 export default abstract class Module implements IMessager
 {
     private static _Initialize() { _m.Initialize(); }
@@ -24,7 +24,7 @@ export default abstract class Module implements IMessager
         _m.RegisterUpdate(this);
     }
 
-    constructor(name: string, identifier: string) { this.name = name; this.identifier = identifier; this.m_enableUpdate = this.Update !== Module.prototype.Update; _m.Register(this); }
+    constructor(name: string, identifier: string) { this.name = name; this.identifier = identifier; this.m_enableUpdate = this.Update !== Module.prototype.Update; __g._m.Register(this); }
 
     public Update() {}
     
@@ -55,6 +55,9 @@ export class ModuleManager
     private m_i: number = 0;
     private m_c: number = 0;
     
+    constructor(){
+        this.Initialize();
+    }
     private Register(m: Module)
     {
         this.m_modules.push(m);
@@ -110,5 +113,5 @@ declare global
     const __manager: ModuleManager;
 }
 
-_m = new ModuleManager();
+//_m = new ModuleManager();
 //__g.__manager = _m;

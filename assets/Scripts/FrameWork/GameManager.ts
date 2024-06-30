@@ -10,9 +10,11 @@ export class  GameManger {
 
     InitModule(){
         var _m = new ModuleManager();
+        __g._m=_m;
         __g.__manager = _m;
         __g.__TestModule=new Module_test("Module_test",'__TestModule');
         __g.__ResManager=new ResManager();
+        __manager
         console.log("Init Module Success!!!");
     }
 

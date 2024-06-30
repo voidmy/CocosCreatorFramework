@@ -40,6 +40,9 @@ export class Window_C {
    */
     immediatedestroy: boolean = false;
     constructor() {
+        this.windowName=this.constructor.name;
+        //console.log(" this.windowName :"+  this.constructor.name);
+        //console.log(  this);
         this.initialization();
     }
 
