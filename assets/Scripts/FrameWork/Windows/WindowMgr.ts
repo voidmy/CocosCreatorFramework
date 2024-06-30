@@ -29,9 +29,21 @@ export class Window_C {
     needBgMask: boolean;
     needBgClick: boolean;
     windowNode: Node;
+
+    /*
+    是否应用打开关闭动画
+    */
+    isApplyAni: boolean = true;
+
+    /*
+   是否在关闭的时候就摧毁，不缓存
+   */
+    immediatedestroy: boolean = false;
     constructor() {
-        //super();
+        this.initialization();
     }
+
+
     private static getCache(w: any) {
         if (!this.map.has(w)) {
             this.map.set(w, new w());
@@ -134,7 +146,46 @@ export class Window_C {
     hideImmediately() {
         this.isShowing = false;
         this.SetActive(false);
+        if (this.immediatedestroy) {
+            Window_C.DelWindow(this);
+        }
 
+    }
+    private static DelWindow(w: Window_C) {
+        if (!w || w.isShowing)
+            return;
+        switch (w.type) {
+            case WindowType.FullScreen:
+                {
+                    let idx = this.windows.findIndex(gw => gw.windowName == w.windowName);
+                    if (idx > -1) {
+                        this.windows.splice(idx, 1);
+                       w.dispose();
+                        return;
+                    }
+                }
+                break;
+            case WindowType.Popup:
+                {
+                    let idx = this.popupWindows.findIndex(gw => gw.windowName == w.windowName);
+                    if (idx > -1) {
+                        this.popupWindows.splice(idx, 1);
+                       w.dispose();
+                        return;
+                    }
+                }
+                break;
+            default:
+            {
+                let idx = this.globalWindows.findIndex(gw => gw.windowName == w.windowName);
+                if (idx > -1) {
+                    this.globalWindows.splice(idx, 1);
+                   w.dispose();
+                    return;
+                }
+            }
+                break;
+        }
     }
 
     SetActive(vis: boolean): void {
@@ -147,9 +198,6 @@ export class Window_C {
         this.SetActive(true);
         this.onBindData();
         this.doShowAnimation();
-
-
-
     }
 
     hide(): void {
@@ -158,10 +206,20 @@ export class Window_C {
         this.doHideAnimation();
         //this.doShowAnimation();
     }
+    dispose(): void {
+        console.log("===  destroy node name:"+this.windowNode.name);
+       this.windowNode.destroy();
+    }
+
+
     protected doShowAnimation() {
 
         this.onBindData();
         this.regirestModuleEvent();
+        if (!this.isApplyAni) {
+            this.showAnimationComplete();
+            return;
+        }
         this.windowNode.setScale(0, 0);
 
         tween(this.windowNode)
@@ -174,11 +232,13 @@ export class Window_C {
 
     protected doHideAnimation() {
 
-        this.onBindData();
-        //this.windowNode.setScale(0, 0);
 
+        if (!this.isApplyAni) {
+            this.HideAnimationComplete();
+            return;
+        }
         tween(this.windowNode)
-            .to(0.4, { scale: new Vec3(0.2, 0.2, 0.2) }, { easing: 'backIn' }) 
+            .to(0.4, { scale: new Vec3(0.2, 0.2, 0.2) }, { easing: 'backIn' })
             .call(() => {
                 this.HideAnimationComplete();
             })
@@ -194,11 +254,9 @@ export class Window_C {
         CCMessageCenter.remove(this);
         this.hideImmediately();
     }
-    private regirestModuleEvent()
-    {
+    private regirestModuleEvent() {
         CCMessageCenter.remove(this);
-        __manager.Foreach((m: any) =>
-        {
+        __manager.Foreach((m: any) => {
             let me = this[m.identifier];
             me && CCMessageCenter.register(m, this, me);
         });
@@ -225,6 +283,13 @@ export class Window_C {
  * 窗口隐藏事件，动画完成后调用
  */
     protected onHide() {
+
+    }
+
+    /**
+     * 初始化调用，设置是否应用动画，window 类型等
+     */
+    protected initialization() {
 
     }
 }
