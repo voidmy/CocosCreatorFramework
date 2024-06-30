@@ -29,7 +29,7 @@ export class Window_C {
     needBgMask: boolean;
     needBgClick: boolean;
     windowNode: Node;
-
+    BgNode: Node;
     /*
     是否应用打开关闭动画
     */
@@ -40,7 +40,7 @@ export class Window_C {
    */
     immediatedestroy: boolean = false;
     constructor() {
-        this.windowName=this.constructor.name;
+        this.windowName = this.constructor.name;
         //console.log(" this.windowName :"+  this.constructor.name);
         //console.log(  this);
         this.initialization();
@@ -85,7 +85,7 @@ export class Window_C {
         this.m_args = args;
     }
     /**
-    * 显示一个窗口 注意是异步的
+    * 显示一个窗口 注意是异步的 ,预制中bg 名称会当背景遮罩出来
     * @param w 窗口类型
     * @param args 需要传递到窗口的参数
     */
@@ -148,6 +148,7 @@ export class Window_C {
 
     hideImmediately() {
         this.isShowing = false;
+        this.SetBgEnd();
         this.SetActive(false);
         if (this.immediatedestroy) {
             Window_C.DelWindow(this);
@@ -163,7 +164,7 @@ export class Window_C {
                     let idx = this.windows.findIndex(gw => gw.windowName == w.windowName);
                     if (idx > -1) {
                         this.windows.splice(idx, 1);
-                       w.dispose();
+                        w.dispose();
                         return;
                     }
                 }
@@ -173,20 +174,20 @@ export class Window_C {
                     let idx = this.popupWindows.findIndex(gw => gw.windowName == w.windowName);
                     if (idx > -1) {
                         this.popupWindows.splice(idx, 1);
-                       w.dispose();
+                        w.dispose();
                         return;
                     }
                 }
                 break;
             default:
-            {
-                let idx = this.globalWindows.findIndex(gw => gw.windowName == w.windowName);
-                if (idx > -1) {
-                    this.globalWindows.splice(idx, 1);
-                   w.dispose();
-                    return;
+                {
+                    let idx = this.globalWindows.findIndex(gw => gw.windowName == w.windowName);
+                    if (idx > -1) {
+                        this.globalWindows.splice(idx, 1);
+                        w.dispose();
+                        return;
+                    }
                 }
-            }
                 break;
         }
     }
@@ -196,6 +197,7 @@ export class Window_C {
     }
 
     show(): void {
+        this.SetBgStart();
         this.isShowing = true;
         console.log("===  show");
         this.SetActive(true);
@@ -204,14 +206,13 @@ export class Window_C {
     }
 
     hide(): void {
-        console.log("hide===");
-        ///window.hideImmediately
+        this.SetBgStart();
         this.doHideAnimation();
         //this.doShowAnimation();
     }
     dispose(): void {
-        console.log("===  destroy node name:"+this.windowNode.name);
-       this.windowNode.destroy();
+        console.log("===  destroy node name:" + this.windowNode.name);
+        this.windowNode.destroy();
     }
 
 
@@ -249,10 +250,12 @@ export class Window_C {
     }
 
     private showAnimationComplete() {
+        this.SetBgEnd();
         this.onShown();
     }
 
     private HideAnimationComplete() {
+        this.SetBgEnd();
         this.onHide();
         CCMessageCenter.remove(this);
         this.hideImmediately();
@@ -265,10 +268,26 @@ export class Window_C {
         });
     }
 
+    private SetBgStart():void{
+        let bg = this.windowNode.getChildByName("bg");
+        if (bg) {
+            let index = this.windowNode.getSiblingIndex();
+            bg.parent.parent.insertChild(bg, index);
+            this.BgNode = bg;
+        }
+    }
 
-    /**
-* 窗口被打开事件，该事件只会在窗口加载完成后调用一次
-*/
+    private SetBgEnd():void{
+        if (this.BgNode) {
+            this.windowNode.insertChild(this.BgNode, 0);
+            this.BgNode=null;
+        }
+    }
+
+
+     /**
+    * 窗口被打开事件，该事件只会在窗口加载完成后调用一次
+    */
     protected onOpened() { }
     /**
      * 重载此方法为窗口绑定界面数据，该方法在窗口动画之前调用
@@ -282,9 +301,9 @@ export class Window_C {
 
     }
 
-    /**
- * 窗口隐藏事件，动画完成后调用
- */
+     /**
+     * 窗口隐藏事件，动画完成后调用
+     */
     protected onHide() {
 
     }
