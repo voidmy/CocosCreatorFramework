@@ -58,7 +58,9 @@ export class HttpRequest extends EventDispatcher {
         };
         /*if (Browser.onBLMiniGame && Browser.onAndroid && !data)
             data = {};*/
-        isJson=false;
+        isJson=true;
+        console.log("data========");
+        console.log(data);
         http.send(isJson ? JSON.stringify(data) : data);
     }
     _onProgress(e) {

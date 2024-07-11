@@ -2,6 +2,7 @@ export default class WebAPI
 {
     static readonly API_TEST="";
     static readonly API_TESTAAA="AAA";
+    static readonly API_START_GAME="game/startGame";
     static customHost: string = "";
     public static GetFullHost(api: string)
     {
@@ -13,6 +14,6 @@ export default class WebAPI
     }
 
 
-    public static readonly HOST_SERVER="http://192.168.1.7:3000/";
-    public static readonly DEBUG_HOST_SERVER="";
+    public static readonly HOST_SERVER="http://10.10.106.66:9001/";
+    public static readonly DEBUG_HOST_SERVER="http://10.10.106.66:9001/";
 }

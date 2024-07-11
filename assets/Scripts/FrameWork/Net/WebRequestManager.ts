@@ -8,7 +8,7 @@ export default class WebRequestManager {
     static Put(url: string, data: any, callBack?:CCHandler) {
         if (__STANDALONE) {
             var res = new BaseResponse();
-            res.success = true;
+            res.code = 0;
             callBack.runWith(res);
             return;
         }
@@ -19,7 +19,7 @@ export default class WebRequestManager {
     static Post(url: string, data: any, callBack?:CCHandler) {
         if (__STANDALONE) {
             var res = new BaseResponse();
-            res.success = true;
+            res.code = 200;
             callBack.runWith(res);
             return;
         }
@@ -30,7 +30,7 @@ export default class WebRequestManager {
     static Get(url: string, data: {}, callBack?:CCHandler) {
         if (__STANDALONE) {
             var res = new BaseResponse();
-            res.success = true;
+            res.code = 200;
             callBack.runWith(res);
             return;
         }
@@ -51,7 +51,7 @@ export default class WebRequestManager {
 
         if (__STANDALONE) {
             var res = new BaseResponse();
-            res.success = true;
+            res.code = 200;
             options.callbackHandler?.runWith(res);
             return;
         }
@@ -86,7 +86,7 @@ export default class WebRequestManager {
             window[callbackName] = null;
             oHead.removeChild(oS);
             var res = new BaseResponse();
-            res.success = false;
+            res.code = 408;
             res.msg = "请求超时！";
             options.callbackHandler && options.callbackHandler.runWith(res);
         }, options.time ?? 10000);
@@ -112,9 +112,11 @@ export interface IJsonPRequest {
 // Common response data
 export class BaseResponse {
     // 0 = OK, others = error
-    public success: boolean = false;
+   // public success: boolean = false;
     // Message may be empty
+    public code: number;
     public msg: string;
+    public data: any;
 }
 
 interface IDestroy{
@@ -175,12 +177,17 @@ class WebRequestHolder implements IDestroy {
     }
 
     private OnComplete() {
-        console.log(`Response: `, this.m_xhr.data);
 
+        
         var response = this.m_xhr.data as BaseResponse;
-        if (!_isString(response.msg)) {
-            console.log(`response BaseResponse=: `, response);
-            response.msg = JSON.stringify(response.msg);
+        console.log(`response BaseResponse=: `);
+        console.log(response);
+        if (!_isString(response.data)) {
+            //console.log(`response BaseResponse=: `, response);
+            response.data = JSON.stringify(response.data);
+        }
+        if(response.code==10000){
+            response.data=JSON.parse(response.data);
         }
         this.m_onComplete?.runWith(response);
         this.destroy();

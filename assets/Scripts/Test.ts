@@ -29,9 +29,11 @@ export class Test extends Component {
            __TestModule.send(__TestModule.MESSAGE_ADD_SCORE); 
        var a={};
        a["lzq"]="KKKK";
-        /*WebRequestManager.Post(WebAPI.GetFullHost(WebAPI.API_TESTAAA),a,CCHandler.create(this,(response)=>{
+        WebRequestManager.Post(WebAPI.GetFullHost(WebAPI.API_TESTAAA),a,CCHandler.create(this,(response)=>{
             console.log("接口信息："+response.msg);
-          }))*/
+            response.msg
+            response.success
+          }))
         console.log("ssssss==");
        });
        CCMessageCenter.register(__TestModule, this, this.OnEvent)

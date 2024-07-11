@@ -3,6 +3,7 @@ const { ccclass, property } = _decorator;
 import "../Res/ResManager";
 import ResManager from '../Res/ResManager';
 import CCMessageCenter from '../Core/CCMessageCenter';
+import ShowMsgWindow, { MsgColorType } from './ShowMsgWindow';
 export enum WindowType {
     FullScreen,
     Popup,
@@ -20,6 +21,7 @@ export class Window_C {
 
     private static m_windowLayer: Node;
 
+    private static m_popLayer: Node;
 
     isShowing: boolean;
 
@@ -72,6 +74,7 @@ export class Window_C {
     public static SetUIRoot(uiroot: Node) {
         this.m_UIRoot = uiroot;
         this.m_windowLayer = uiroot.getChildByPath("Canvas/windowLayer");
+        this.m_popLayer=uiroot.getChildByPath("Canvas/popLayer");
         console.log("SetUIRoot success!!!");
     }
 
@@ -99,14 +102,17 @@ export class Window_C {
                 globalwin.SetArgs(args);
                 //this.globalWindows[idx].show();
                 // return this.globalWindows[idx];
-                globalwin.windowNode.parent.addChild(globalwin.windowNode);
+                let parent=globalwin.windowNode.parent;
+                parent.removeChild(globalwin.windowNode);
+                parent.addChild(globalwin.windowNode);
                 globalwin.show();
-                resolve(globalwin)
+                resolve(globalwin);
+               return;
             }
             idx = this.windows.findIndex(gw => gw.windowName == ww.windowName);
             if (idx > -1) {
                 for (var i = 0; i < this.popupWindows.length; i++) {
-                    // 关闭所有Windows[
+                    // 关闭所有Wpopup
                     this.popupWindows[i].hideImmediately();
                 }
                 if (this.windows[idx].isShowing) {
@@ -125,6 +131,20 @@ export class Window_C {
                 this.windows.push(_w);
                 return _w;
             }
+            idx = this.popupWindows.findIndex(gw => gw.windowName == ww.windowName);
+            if(idx>-1){
+                var popupWin = this.popupWindows[idx];
+                popupWin.SetArgs(args);
+                //this.globalWindows[idx].show();
+                // return this.globalWindows[idx];
+                let parent=popupWin.windowNode.parent;
+                parent.removeChild(popupWin.windowNode);
+                parent.addChild(popupWin.windowNode);
+                popupWin.show();
+                resolve(popupWin);
+               return;
+            }
+
             ww = new w();
             if (ww.type == WindowType.Global)
                 this.globalWindows.push(ww);
@@ -135,7 +155,12 @@ export class Window_C {
             ww.SetArgs(args);
             ResManager.LoadWIndow(w.name).then((Prefab) => {
                 let node = instantiate(Prefab);
-                this.m_windowLayer.addChild(node);
+                if(ww.type==WindowType.Popup){
+                    this.m_popLayer.addChild(node);
+                }else{
+                    this.m_windowLayer.addChild(node);
+                }
+
                 ww.windowNode = node;
                 ww.onOpened();
                 ww.show();
@@ -144,6 +169,15 @@ export class Window_C {
 
             }).catch((err) => { console.error(err); });
         });
+    }
+
+    public static HideAll() {
+        for (var i = 0; i < this.popupWindows.length; i++) {
+            this.popupWindows[i].hideImmediately();
+        }
+        for (var i = 0; i < this.windows.length; i++) {
+            this.windows[i].hideImmediately();
+        }
     }
 
     hideImmediately() {
@@ -197,9 +231,12 @@ export class Window_C {
     }
 
     show(): void {
+        let parent= this.windowNode.parent;
+        parent.removeChild(this.windowNode);
+        parent.addChild(this.windowNode);
         this.SetBgStart();
         this.isShowing = true;
-        console.log("===  show");
+        //console.log("===  show");
         this.SetActive(true);
         this.onBindData();
         this.doShowAnimation();
@@ -268,7 +305,7 @@ export class Window_C {
         });
     }
 
-    private SetBgStart():void{
+    private SetBgStart(): void {
         let bg = this.windowNode.getChildByName("bg");
         if (bg) {
             let index = this.windowNode.getSiblingIndex();
@@ -277,17 +314,17 @@ export class Window_C {
         }
     }
 
-    private SetBgEnd():void{
+    private SetBgEnd(): void {
         if (this.BgNode) {
             this.windowNode.insertChild(this.BgNode, 0);
-            this.BgNode=null;
+            this.BgNode = null;
         }
     }
 
 
-     /**
-    * 窗口被打开事件，该事件只会在窗口加载完成后调用一次
-    */
+    /**
+   * 窗口被打开事件，该事件只会在窗口加载完成后调用一次
+   */
     protected onOpened() { }
     /**
      * 重载此方法为窗口绑定界面数据，该方法在窗口动画之前调用
@@ -301,9 +338,9 @@ export class Window_C {
 
     }
 
-     /**
-     * 窗口隐藏事件，动画完成后调用
-     */
+    /**
+    * 窗口隐藏事件，动画完成后调用
+    */
     protected onHide() {
 
     }
@@ -314,5 +351,7 @@ export class Window_C {
     protected initialization() {
 
     }
+
+
 }
 
